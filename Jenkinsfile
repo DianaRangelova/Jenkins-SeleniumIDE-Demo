@@ -13,13 +13,15 @@ pipeline {
             steps {
 // Install .Net
                 bat '''
-                echo Installing .NET SDK 6.0
-                choco install dotnet-sdk -y --version=6.0.100
+                echo Downloading .Net 6 Sdk
+                curl -l -o dotnet-sdk-6.0.132-win-x64 https://download.visualstudio.microsoft.com/download/pr/69af2ee0-5379-4cd7-9aa8-9bed36318256/cbb00555c0ad657921351a6905aa2472/dotnet-sdk-6.0.132-win-x64
+                echo installing dotnet-sdk-6.0.132-win-x64
+                dotnet-sdk-6.0.132-win-x64 /quiet /norestart
                 '''
             }
         }
 
-        stage('Restore dependencies') {
+        stage('Restore Nuget Packages') {
             steps {
                 // Restore dependencies using the solution file
                 bat 'dotnet restore SeleniumIde.sln'
@@ -44,7 +46,10 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: '**/TestResults/*.trx', allowEmptyArchive: true
-            junit '**/TestResults/*.trx'
+            step {
+                $class: 'MSTestPublisher',
+                testResultsFile: '**/TestResults/*.trx'
+            }
         }
     }
 }
