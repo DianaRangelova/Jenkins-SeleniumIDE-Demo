@@ -19,38 +19,6 @@ pipeline {
             }
         }
 
-        stage('Uninstall Current Chrome') {
-            steps {
-// Install Dependencies
-                bat '''
-                echo Uninstalling current Google Chrome
-                choco uninstall googlechrome -y
-                '''
-            }
-        }
-
-        stage('Install Specific Version of Chrome') {
-            steps {
-// Build
-                bat '''
-                echo Installing Google Chrome version %CHROME_VERSION%
-                choco install googlechrome --version=%CHROME_VERSION% -y --allow-downgrade --ignore-checksums
-                '''
-            }
-        }
-
-        stage('Download and Install ChromeDriver') {
-            steps {
-// Run Tests
-                bat '''
-                echo Downloading ChromeDriver version %CHROMEDRIVER_VERSION%
-                powershell -command "Invoke-WebRequest -Uri https://chromedriver.storage.googleapis.com/%CHROMEDRIVER_VERSION%/chromedriver_win32.zip -OutFile chromedriver.zip -UseBasicParsing"
-                powershell -command "Expand-Archive -Path chromedriver.zip -DestinationPath ."
-                powershell -command "Move-Item -Path .\\chromedriver.exe -Destination '%CHROME_INSTALL_PATH%\\chromedriver.exe' -Force"
-                '''
-            }
-        }
-
         stage('Restore dependencies') {
             steps {
                 // Restore dependencies using the solution file
